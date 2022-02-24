@@ -1,0 +1,234 @@
+= Antora Docs Prototype
+
+This repository contains the antora playbook to generate a new docs site based on multiple repositories.
+
+The ontology of the new docs site will be easier to maintain having the following benefits.
+
+== Benefits
+
+* Docs UI is maintained seperately from the content allowing designers to easily brand and manipulate .css, partials, etc.
+
+* Seperate repositories (Components) makes it much easier to maintain and contribute content by multiple teams
+
+* Versioned repositories provide a clear lineage of information based on the release they are tied to 
+
+* Assets relevant for a given repository are versioned and maintained where they make sense 
+
+* Agility is improved because it is simple to add new components or remove existing
+
+* The entire site can be generated and viewed locally on the authors laptop without special software just a browser
+
+* Video and other media can easily be added and referenced to external sources (i.e. youtube)
+
+* CI deployment can be targeted for netlify or other CDN locations improving availability
+
+* Private repositories can be added and generated in the build process mitigating the need for 1 public repo
+
+=== Sample Repository Structure (CoPilot)
+
+....
+$ tree
+.
+├── README.adoc
+├── antora.yml
+└── modules
+    └── ROOT
+        ├── assets
+        │   └── images
+        │       ├── appIQ_1.png
+        │       ├── appIQ_2.png
+        │       ├── appIQ_3.png
+        │       ├── bgp_1.png
+        │       ├── bgp_2.png
+        │       ├── bgp_3.png
+        │       ├── copilot_dashboard.png
+        │       ├── copilot_flowiq.png
+        │       ├── copilot_login_customer_id.png
+        │       ├── copilot_login_service_account.png
+        │       ├── copilot_login_user_account.png
+        │       ├── copilot_topology.png
+        │       ├── cplt_azr_attach_disk.png
+        │       ├── cplt_azr_create.png
+        │       ├── cplt_azr_create_app.png
+        │       ├── cplt_azr_email.png
+        │       ├── cplt_azr_get_now.png
+        │       ├── gcp_copilot_1.png
+        │       ├── gcp_copilot_2.png
+        │       ├── gcp_copilot_3.png
+        │       ├── latency_1.png
+        │       ├── latency_2.png
+        │       ├── service_account_modal.png
+        │       ├── topology_replay_time_preview.png
+        │       ├── tree_pane_icon_disk_usage_table.png
+        │       └── webhookImage.png
+        ├── nav.adoc
+        └── pages
+            ├── copilot_faq.adoc
+            ├── copilot_getting_started.adoc
+            ├── copilot_overview.adoc
+            ├── copilot_reference_guide.adoc
+            ├── copilot_release_notes.adoc
+            └── copilot_release_notes_images.adoc
+
+5 directories, 35 files
+....
+
+
+== Architecture
+
+In this repo, the antora-playbook.yml file is used to generate the doc site.
+
+=== UI
+
+It uses a UI bundle customized from asciidoc with some basic branding.
+
+It is forked here the UI bundle is generated automatically from PR and hosted with a temporary url on netlify
+
+https://github.com/asciidoctor/asciidoctor-docs-ui[Asciidoctor Antora UI]
+
+[NOTE]
+.Note
+====
+You don't have to do anything with this repo the ui bundle on netlify is referenced in antora-playbook.yml
+====
+
+=== Content
+
+To demonstrate how the antora framework works, cloned content from the following sections of `docs.aviatrix.com`
+
+* Release Notes
+* CoPilot
+
+This content is relatively static and represents some of the best quality information from the original site. The repos are public.
+
+==== GitHub Repos
+
+https://github.com/trvsmtchll/release-notes[Release Notes]
+
+https://github.com/trvsmtchll/copilot[CoPilot]
+
+
+== Build the Prototype
+
+[#install-nodejs]
+== Install Node.js
+
+Antora requires an active long term support (LTS) release of Node.js.
+To see if you have Node.js installed, and which version, open a terminal and type:
+
+ $ node -v
+
+This command should return an {url-node-releases}[active Node.js LTS version number], for example:
+
+[subs=+attributes]
+ $ node --version
+ v{version-node}
+
+If you have an active Node.js LTS version on your machine, you're ready to <<install-antora,install Antora>>.
+
+If *no version number is displayed in your terminal*, you need to install Node.js.
+We recommend using nvm to install Node.js, though you are free to take a different path.
+Follow one of these guides to learn how to install nvm and Node.js on your platform.
+
+* xref:install:linux-requirements.adoc#install-nvm[Install nvm and Node.js on Linux]
+* xref:install:macos-requirements.adoc#install-nvm[Install nvm and Node.js on macOS]
+* xref:install:windows-requirements.adoc[Install nvm and Node.js on Windows]
+
+If *you have Node.js installed, but it isn't an active LTS version*, you need to upgrade Node.js.
+To upgrade to the latest Node.js LTS version and set it as your default version, type the following commands in your terminal:
+
+.Linux and macOS
+[subs=+attributes]
+ $ nvm install --lts
+ $ nvm alias default {version-node-major}
+
+.Windows
+[subs=+attributes]
+ $ nvm install {version-node}
+ $ nvm alias default {version-node}
+
+Once you've installed Node.js, it's time to install Antora.
+
+[#install-antora]
+== Install Antora
+
+To generate documentation sites with Antora, you need the Antora command line interface (CLI) and the Antora site generator.
+To install Antora, begin by making a new directory for your site named [.path]_docs-site_ and switch to it.
+
+ $ mkdir docs-site && cd docs-site
+
+Next, let's install the required packages within the playbook project so you can run the `antora` command using `npx`.
+
+[subs=+attributes]
+ $ node -e "fs.writeFileSync('package.json', '{}')"
+ $ npm i -D -E @antora/cli@{page-component-version}.0 @antora/site-generator@{page-component-version}.0
+
+Verify the `antora` command is now available by running:
+
+ $ npx antora -v
+
+If the installation is successful, the command will report the version of the Antora CLI and site generator packages you specified.
+
+[subs=+attributes]
+ $ npx antora -v
+ @antora/cli: {page-component-version}.0
+ @antora/site-generator: {page-component-version}.0
+
+These versions can also be found in [.path]_package.json_, which you can use to upgrade Antora.
+
+You have the option of installing Antora globally so that the `antora` command is available on your PATH.
+To do so, pass the `-g` option to `npm i`.
+
+[subs=+attributes]
+ $ npm i -g @antora/cli@{page-component-version}.0 @antora/site-generator@{page-component-version}.0
+
+You can verify that the `antora` command is available on your path by running:
+
+ $ antora -v
+
+We strongly recommend that you install Antora within the playbook project.
+This strategy makes it easier to manage the version of Antora.
+It also ensures that the version of Antora matches the version for which the playbook was made.
+
+Now you're ready to run the prototype.
+
+....
+
+npx antora --fetch antora-playbook.yml
+
+....
+
+You may see a few errors about images, they can be ignored for now. Open the site in your browser and note the component drawer on lower left.
+
+This is still WIP navigation will be moved up to a tree format `this is a prototype`
+
+
+....
+
+s$ npx antora --fetch antora-playbook.yml
+[clone] https://github.com/trvsmtchll/copilot.git       [#######################################################################################################
+[clone] https://github.com/trvsmtchll/release-notes.git [#######################################################################################################
+[11:05:29.473] ERROR (asciidoctor): target of image not found: field_notices_media/fn14.png
+    file: modules/ROOT/pages/field_notices.adoc
+    source: https://github.com/trvsmtchll/release-notes.git (refname: main)
+[11:05:29.476] ERROR (asciidoctor): target of image not found: field_notices_media/1404Controller.png
+    file: modules/ROOT/pages/field_notices.adoc
+    source: https://github.com/trvsmtchll/release-notes.git (refname: main)
+[11:05:29.476] ERROR (asciidoctor): target of image not found: field_notices_media/1804Controller.png
+    file: modules/ROOT/pages/field_notices.adoc
+    source: https://github.com/trvsmtchll/release-notes.git (refname: main)
+[11:05:29.485] ERROR (asciidoctor): target of image not found: image_release_notes_media/controller_migration.png
+    file: modules/ROOT/pages/image_release_notes.adoc
+    source: https://github.com/trvsmtchll/release-notes.git (refname: main)
+[11:05:29.486] ERROR (asciidoctor): target of image not found: image_release_notes_media/gateway_replace.png
+    file: modules/ROOT/pages/image_release_notes.adoc
+    source: https://github.com/trvsmtchll/release-notes.git (refname: main)
+Site generation complete!
+Open file:///Users/travis/cloud-dev/trvsmtchll/avx-antora-docs/build/site/index.html in a browser to view your site.
+
+....
+
+
+
+
+
